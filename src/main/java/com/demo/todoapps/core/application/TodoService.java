@@ -1,6 +1,6 @@
 package com.demo.todoapps.core.application;
 
-import com.demo.todoapps.web.TodoRestController.*;
+import com.demo.todoapps.core.domain.Todo;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class TodoService {
     }
 
 
-    private Todo save(Todo todo) {
+    public Todo save(Todo todo) {
         if(todo == null){
            todo =  new Todo(idGenerator.incrementAndGet(), todo.getText(), todo.isCompleted());
         }
@@ -41,7 +41,7 @@ public class TodoService {
 
     }
 
-    private boolean  deleteById(Long id){
+    public boolean  deleteById(Long id){
         return todos.remove(id) != null ;
     }
 
