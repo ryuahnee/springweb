@@ -21,4 +21,10 @@ public class UserResponse {
         this.name = name;
         this.email = email;
     }
+
+    @Builder
+    public UserResponse(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }
