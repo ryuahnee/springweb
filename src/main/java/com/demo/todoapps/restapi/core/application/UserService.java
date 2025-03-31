@@ -1,8 +1,8 @@
 package com.demo.todoapps.restapi.core.application;
 
 import com.demo.todoapps.restapi.core.domain.User;
+import com.demo.todoapps.restapi.core.domain.UserRequest;
 import com.demo.todoapps.restapi.core.domain.UserResponse;
-import com.demo.todoapps.restapi.core.domain.WriteUser;
 import com.demo.todoapps.restapi.data.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -19,24 +19,32 @@ public class UserService  {
         this.userRepository = userRepository;
     }
 
-    public UserResponse saveUser(User user) {
+    public UserResponse saveUser(UserRequest userRequest) {
 
-        if(user.getId() != 0 && userRepository.findById(user.getId()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 회원입니다.");
+        if(userRequest.getId() != 0 && userRepository.findById(userRequest.getId()).isPresent()) {
+
+            User user = User.builder()  // 또는 적절한 생성 방식 사용
+                    .name(userRequest.getName())
+                    .email(userRequest.getEmail())
+                    .build();
+
+            User savedUser = userRepository.save(user);
+            return UserResponse.builder()
+                    .id(userRequest.getId())
+                    .name(userRequest.getName())
+                    .email(userRequest.getEmail())
+                    .build();
         }
-        User saveUser = userRepository.save(user);
-        return UserResponse.builder()
-                .id(saveUser.getId())
-                .name(saveUser.getName())
-                .email(saveUser.getEmail())
-                .build();
+
+
+        throw new RuntimeException("이미 존재하는 회원입니다.");
     }
 
     @Transactional
-    public boolean update(Long id, WriteUser writeuser) {
+    public boolean update(Long id, UserRequest userRequest) {
         if (userRepository.findById(id).isPresent()) {
             User user = userRepository.findById(id).get();
-            User userUpdate = user.update(writeuser.getName(), writeuser.getEmail());
+            User userUpdate = user.update(userRequest.getName(), userRequest.getEmail());
             userRepository.save(userUpdate);
             return true;
         }

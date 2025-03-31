@@ -2,6 +2,7 @@ package com.demo.todoapps.restapi.core.domain;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -24,4 +25,9 @@ public class User {
         return this;
     }
 
+    @Builder
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }

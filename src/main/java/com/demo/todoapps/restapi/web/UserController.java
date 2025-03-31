@@ -1,9 +1,11 @@
 package com.demo.todoapps.restapi.web;
 
 import com.demo.todoapps.restapi.core.application.UserService;
-import com.demo.todoapps.restapi.core.domain.User;
+
+import com.demo.todoapps.restapi.core.domain.UserRequest;
 import com.demo.todoapps.restapi.core.domain.UserResponse;
-import com.demo.todoapps.restapi.core.domain.WriteUser;
+
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +23,13 @@ private final UserService userService;
     }
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@RequestBody User user){
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest user){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.saveUser(user));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id , @RequestBody WriteUser user){
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id , @Valid @RequestBody UserRequest user){
         boolean update = userService.update(id, user);
         return update ?
                 ResponseEntity.ok().build() :
