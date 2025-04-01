@@ -28,7 +28,7 @@ public class TodoRestController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Todo> getTodoId(@PathVariable Long id){
-        return ResponseEntity.ok(todoService.fidById(id));
+        return ResponseEntity.ok(todoService.findById(id));
     }
 
 
@@ -49,7 +49,7 @@ public class TodoRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void  delete(@RequestParam Long id){
 
-        todoService.fidById(id);
+        todoService.findById(id);
         todoService.deleteById(id);
 
     }
