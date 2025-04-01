@@ -1,48 +1,55 @@
 package com.demo.todoapps.core.application;
 
 import com.demo.todoapps.core.domain.Todo;
+import com.demo.todoapps.core.domain.TodoNotFoundException;
+import com.demo.todoapps.data.TodoRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Service
 public class TodoService {
 
+    private final TodoRepository todoRepository;
+
     private final ConcurrentHashMap<Long, Todo> todos = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(0);
 
-    // 초기 데이터 추가
-    public TodoService() {
-        save(new Todo(idGenerator.incrementAndGet(), "스프링 MVC 학습하기", false));
-        save(new Todo(idGenerator.incrementAndGet(), "JPA 학습하기", false));
-        save(new Todo(idGenerator.incrementAndGet(), "REST API 설계하기", true));
+    public TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
     }
 
 
    public List<Todo> findAll(){
-        return new ArrayList<>(todos.values());
+       return todoRepository.findAll();
    }
 
-    public Optional<Todo> fidById(Long id){
-        return Optional.ofNullable(todos.get(id));
+    public Todo findById(Long id){
+        return todoRepository.findById(id)
+                .orElseThrow(() -> new TodoNotFoundException(id));
     }
 
+    public List<Todo> findByCompleted(boolean completed){
+        return todoRepository.findByCompleted(completed);
+    }
+
+    public List<Todo> searchByText(String text){
+       return todoRepository.findByTextContaining(text);
+    }
 
     public Todo save(Todo todo) {
-        if(todo == null){
-           todo =  new Todo(idGenerator.incrementAndGet(), todo.getText(), todo.isCompleted());
-        }
-        todos.put(todo.getId(),todo);
-        return todo;
-
+         return todoRepository.save(todo);
     }
 
-    public boolean  deleteById(Long id){
-        return todos.remove(id) != null ;
+    public void deleteById(Long id){
+        if(todoRepository.existsById(id)){
+           todoRepository.deleteById(id);
+        }
+        throw new TodoNotFoundException(id);
     }
 
 }

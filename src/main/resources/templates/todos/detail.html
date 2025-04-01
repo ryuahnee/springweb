@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>할 일 상세 보기</title>
+    <style>
+
+        .completed { text-decoration: line-through; color: #888; }
+        .todo-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .actions { margin-top: 15px; }
+        .actions a, .actions button { margin-right: 10px; }
+
+        .date-info {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>할 일 상세 보기</h1>
+
+<div class="todo-card" th:classappend="${todo.completed ? 'completed' : ''}">
+    <h2 th:text="${todo.text}">할 일 내용</h2>
+    <p>상태: <span th:text="${todo.completed ? '완료' : '진행 중'}">상태</span></p>
+    <p>ID: <span th:text="${todo.id}">ID</span></p>
+
+    <div class="date-info">
+        <p>생성일: <span th:text="${#temporals.format(todo.createdAt, 'yyyy-MM-dd HH:mm:ss')}">생성일</span></p>
+        <p>수정일: <span th:text="${#temporals.format(todo.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">수정일</span></p>
+    </div>
+
+    <div class="actions">
+        <form th:action="@{/todos/{id}/toggle(id=${todo.id})}" method="post" style="display: inline;">
+            <button type="submit" th:text="${todo.completed ? '미완료로 표시' : '완료로 표시'}">상태 변경</button>
+        </form>
+        <form th:action="@{/todos/{id}/delete(id=${todo.id})}" method="post" style="display: inline;">
+            <button type="submit" onclick="return confirm('정말로 삭제하시겠습니까?')">삭제</button>
+        </form>
+        <a th:href="@{/todos}">목록으로 돌아가기</a>
+    </div>
+</div>
+</body>
+</html>

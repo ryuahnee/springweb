@@ -2,13 +2,15 @@ package com.demo.todoapps.web;
 
 import com.demo.todoapps.core.application.TodoService;
 import com.demo.todoapps.core.domain.Todo;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/todos")
@@ -20,41 +22,59 @@ public class TodoRestController {
         this.todoService = todoService;
     }
 
+
     @GetMapping
-    public List<Todo> getAllTodos(){
-      return todoService.findAll();
+    public List<Todo> getAllTodos(@RequestParam(name = "search",required = false)String search,
+                                  @RequestParam(name="completed",required = false)Boolean completed){
+
+        if(search != null || !search.isEmpty()){
+            return todoService.searchByText(search);
+        }else if(completed != null ){
+            return todoService.findByCompleted(completed);
+        }else {
+            return todoService.findAll();
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Todo> getTodoId(@PathVariable Long id){
-        return todoService.fidById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(todoService.findById(id));
     }
 
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Todo create(@PathVariable Todo todo){
+    public Todo create(@Valid @PathVariable Todo todo){
       return todoService.save(todo);
     }
 
 
-    @PostMapping("/{id}")
-    public ResponseEntity<Todo> update(@PathVariable Long id , @RequestBody Todo todo){
-        return todoService.fidById(id).map(extend -> {
-                extend.setId(id);
-              return ResponseEntity.ok(todoService.save(todo));
-            })
-                .orElse(ResponseEntity.notFound().build());
+    @PutMapping("/{id}")
+    public ResponseEntity<Todo> update(@PathVariable Long id , @Valid @RequestBody Todo todo){
+        return ResponseEntity.ok(todoService.save(todo));
     }
 
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void  delete(@RequestParam Long id){
-        todoService.fidById(id).map(exid ->{
-            todoService.deleteById(id);
-            return new ResponseEntity<Todo>(HttpStatus.NO_CONTENT);
-        })
-                .orElse(ResponseEntity.notFound().build());
+
+        todoService.findById(id);
+        todoService.deleteById(id);
+
+    }
+
+    // 유효성 검증 실패 처리
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 
 
