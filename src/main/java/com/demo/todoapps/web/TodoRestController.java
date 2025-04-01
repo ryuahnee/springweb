@@ -5,6 +5,7 @@ import com.demo.todoapps.core.domain.Todo;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +22,18 @@ public class TodoRestController {
         this.todoService = todoService;
     }
 
+
     @GetMapping
-    public List<Todo> getAllTodos(){
-      return todoService.findAll();
+    public List<Todo> getAllTodos(@RequestParam(name = "search",required = false)String search,
+                                  @RequestParam(name="completed",required = false)Boolean completed){
+
+        if(search != null || !search.isEmpty()){
+            return todoService.searchByText(search);
+        }else if(completed != null ){
+            return todoService.findByCompleted(completed);
+        }else {
+            return todoService.findAll();
+        }
     }
 
     @GetMapping("/{id}")

@@ -7,7 +7,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 public class TodoController {
@@ -18,11 +21,30 @@ public class TodoController {
     }
 
     @GetMapping
-    public String listTodos(Model model) {
-        model.addAttribute("todos", todoService.findAll());
-        model.addAttribute("newTodo", new Todo());
+    public String listTodos(@RequestParam(name = "search",required = false)String search,
+                            @RequestParam(name="completed",required = false)Boolean completed,
+                            Model model){
+
+        List<Todo> todos;
+        if(search != null || !search.isEmpty()){
+            todos =  todoService.searchByText(search);
+            model.addAttribute("searchTerm", search);
+        }else if(completed != null ){
+            todos =    todoService.findByCompleted(completed);
+            model.addAttribute("completedFilter", completed);
+        }else {
+            todos = todoService.findAll();
+        }
+
+        model.addAttribute("todos",todos);
+
+        if (!model.containsAttribute("newTodo")) {
+            model.addAttribute("newTodo", new Todo());
+        }
+
         return "todos/list";
     }
+
     @PostMapping
     public String createTodo(@ModelAttribute Todo todo, RedirectAttributes redirectAttributes) {
         todoService.save(todo);
