@@ -21,10 +21,9 @@ public class TodoRestController {
         this.todoService = todoService;
     }
 
-
     @GetMapping
-    public List<Todo> getAllTodos(@RequestParam(name = "search",required = false)String search,
-                                  @RequestParam(name="completed",required = false)Boolean completed){
+    public List<Todo> getAllTodos(@RequestParam(name = "search",required = false, defaultValue ="")String search,
+                                  @RequestParam(name="completed",required = false,defaultValue = "true")Boolean completed){
 
         if(search != null || !search.isEmpty()){
             return todoService.searchByText(search);
