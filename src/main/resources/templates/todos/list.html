@@ -74,6 +74,14 @@
         <a th:href="@{/todos(completed=true)}" th:classappend="${completedFilter != null && completedFilter == true} ? 'active'">완료</a>
     </div>
 </div>
+<!-- 페이지네이션 추가
+<div class="pagination" th:if="${totalPages > 1}">
+    <span>페이지:</span>
+    <a th:each="i: ${#numbers.sequence(0, totalPages - 1)}"
+       th:href="@{/todos(page=${i}, size=${page.size}, sort=${sort}, search=${searchTerm}, completed=${completedFilter})}"
+       th:text="${i + 1}"
+       th:class="${i == currentPage ? 'active' : ''}"></a>
+</div> -->
 
 <!-- 새 할 일 추가 폼 -->
 <form th:action="@{/todos}" method="post" th:object="${newTodo}">

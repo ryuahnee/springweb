@@ -3,6 +3,8 @@ package com.demo.todoapps.core.application;
 import com.demo.todoapps.core.domain.Todo;
 import com.demo.todoapps.core.domain.TodoNotFoundException;
 import com.demo.todoapps.data.TodoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,5 +53,20 @@ public class TodoService {
         }
         throw new TodoNotFoundException(id);
     }
+
+    // 페이지네이션 추가
+    public Page<Todo> findAll(Pageable pageable){
+        return todoRepository.findAll(pageable);
+    }
+
+    public Page<Todo> findByCompleted(boolean completed, Pageable pageable){
+        return todoRepository.findByCompleted(completed, pageable);
+    }
+
+    public Page<Todo> searchByText(String text, Pageable pageable){
+        return todoRepository.findByTextContaining(text, pageable);
+    }
+
+
 
 }

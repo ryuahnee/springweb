@@ -27,7 +27,7 @@ public class TodoRestController {
     public List<Todo> getAllTodos(@RequestParam(name = "search",required = false)String search,
                                   @RequestParam(name="completed",required = false)Boolean completed){
 
-        if(search != null || !search.isEmpty()){
+        if(search != null && !search.isEmpty()){
             return todoService.searchByText(search);
         }else if(completed != null ){
             return todoService.findByCompleted(completed);
@@ -44,20 +44,20 @@ public class TodoRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Todo create(@Valid @PathVariable Todo todo){
+    public Todo create(@Valid @RequestBody Todo todo){
       return todoService.save(todo);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Todo> update(@PathVariable Long id , @Valid @RequestBody Todo todo){
+    public ResponseEntity<Todo> update(@PathVariable(name = "id") Long id , @Valid @RequestBody Todo todo){
         return ResponseEntity.ok(todoService.save(todo));
     }
 
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void  delete(@RequestParam Long id){
+    public void  delete(@PathVariable Long id){
 
         todoService.findById(id);
         todoService.deleteById(id);
